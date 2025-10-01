@@ -1,20 +1,32 @@
-[gd_scene load_steps=5 format=3 uid="uid://ccna0h20xukr"]
+[gd_scene load_steps=8 format=3 uid="uid://ccna0h20xukr"]
 
-[ext_resource type="Script" uid="uid://t631fajspe43" path="res://scenes/main.gd" id="1_sugp2"]
-[ext_resource type="PackedScene" uid="uid://blj02xxph5ocw" path="res://scenes/mob.tscn" id="2_jyhfs"]
-[ext_resource type="PackedScene" uid="uid://bdypecw1sk8a1" path="res://scenes/player.tscn" id="3_tbgi4"]
+[ext_resource type="Script" uid="uid://t631fajspe43" path="res://main.gd" id="1_sugp2"]
+[ext_resource type="PackedScene" uid="uid://blj02xxph5ocw" path="res://mob.tscn" id="2_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://bdypecw1sk8a1" path="res://player.tscn" id="3_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://bj3if6opqed6l" path="res://hud.tscn" id="4_jyhfs"]
+[ext_resource type="AudioStream" uid="uid://d1phyf3cfptv8" path="res://art/House In a Forest Loop.ogg" id="5_tefeu"]
+[ext_resource type="AudioStream" uid="uid://cfxo1f3rp3lhj" path="res://art/gameover.wav" id="6_o6xl0"]
 
 [sub_resource type="Curve2D" id="Curve2D_tefeu"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 70, 2, 0, 0, 0, 0, 430, 3, 0, 0, 0, 0, 437, 441, 0, 0, 0, 0, 71, 437, 0, 0, 0, 0, 70, 2)
+"points": PackedVector2Array(0, 0, 0, 0, 70, 2, 0, 0, 0, 0, 430, 3, 0, 0, 0, 0, 429, 284, 0, 0, 0, 0, 430, 692, 0, 0, 0, 0, 31, 697, 0, 0, 0, 0, 70, 2)
 }
-point_count = 5
+point_count = 6
 
 [node name="Main" type="Node"]
 script = ExtResource("1_sugp2")
 mob_scene = ExtResource("2_jyhfs")
 
-[node name="player" parent="." instance=ExtResource("3_tbgi4")]
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.67481464, 0.67481464, 0.6748146, 1)
+
+[node name="Player" parent="." instance=ExtResource("3_tbgi4")]
+position = Vector2(87, 119)
 
 [node name="MobTimer" type="Timer" parent="."]
 wait_time = 0.5
@@ -28,13 +40,23 @@ one_shot = true
 [node name="StartPosition" type="Marker2D" parent="."]
 position = Vector2(240, 450)
 
-[node name="Mobpath" type="Path2D" parent="."]
+[node name="MobPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_tefeu")
 
-[node name="MobSpawnLocation" type="PathFollow2D" parent="Mobpath"]
+[node name="MobSpawnLocation" type="PathFollow2D" parent="MobPath"]
 position = Vector2(70, 2)
 rotation = 0.0027777706
 
-[connection signal="hit" from="player" to="." method="game_over"]
+[node name="HUD" parent="." instance=ExtResource("4_jyhfs")]
+
+[node name="Music" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_tefeu")
+
+[node name="DeathSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_o6xl0")
+
+[connection signal="hit" from="Player" to="." method="game_over"]
 [connection signal="timeout" from="MobTimer" to="." method="_on_mob_timer_timeout"]
 [connection signal="timeout" from="ScoreTimer" to="." method="_on_score_timer_timeout"]
+[connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]
+[connection signal="start_game" from="HUD" to="." method="new_game"]
